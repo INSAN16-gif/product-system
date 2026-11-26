@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delete Product</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Delete Product</h1>
+    <div id="confirmArea"></div>
+  </div>
+
+  <script src="storage.js"></script>
+  <script>
+    const id = Number(new URLSearchParams(location.search).get("id"));
+    const r = Number.isInteger(id) && id > 0 ? getRecordById(id) : null;
+    const area = document.getElementById("confirmArea");
+
+    if (!r) {
+      area.innerHTML = '<p class="muted">Record not found.</p><div class="nav-links"><a href="index.html">Back</a></div>';
+    } else {
+      area.innerHTML = `
+        <div class="detail-card">
+          <p>Are you sure you want to delete this product?</p>
+          <p><strong>Product Name:</strong> <span id="dProd"></span></p>
+          <p><strong>Category:</strong> <span id="dCat"></span></p>
+          <div class="nav-links">
+            <button type="button" id="confirmBtn">Confirm Delete</button>
+            <a href="index.html">Cancel</a>
+          </div>
+        </div>
+      `;
+      document.getElementById("dProd").textContent = r.product_name;
+      document.getElementById("dCat").textContent = r.category;
+      document.getElementById("confirmBtn").addEventListener("click", () => {
+        deleteRecord(r.id);
+        location.href = "index.html";
+      });
+    }
+  </script>
+</body>
+</html>

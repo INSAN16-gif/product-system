@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Product</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Edit Product</h1>
+    <div class="nav-links"><a href="index.html">Back</a></div>
+    <div id="errors"></div>
+    <div id="formArea"></div>
+  </div>
+
+  <script src="storage.js"></script>
+  <script>
+    const id = Number(new URLSearchParams(location.search).get("id"));
+    const r = Number.isInteger(id) && id > 0 ? getRecordById(id) : null;
+    const formArea = document.getElementById("formArea");
+
+    if (!r) {
+      formArea.innerHTML = '<p class="muted">Record not found.</p>';
+    } else {
+      formArea.innerHTML = `
+        <form id="editForm">
+          <div class="form-group">
+            <label for="product_name">Product Name</label>
+            <input type="text" id="product_name" maxlength="100" required>
+          </div>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" id="category" maxlength="50" required>
+          </div>
+          <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" id="price" min="0" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label for="stock">Stock</label>
+            <input type="number" id="stock" min="0" step="1" required>
+          </div>
+          <button type="submit">Update Product</button>
+        </form>
+      `;
+
+      document.getElementById("product_name").value = r.product_name;
+      document.getElementById("category").value = r.category;
+      document.getElementById("price").value = formatPrice(r.price);
+      document.getElementById("stock").value = r.stock;
+
+      document.getElementById("editForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const product_name = document.getElementById("product_name").value.trim();
+        const category = document.getElementById("category").value.trim();
+        const priceRaw = document.getElementById("price").value.trim();
+        const stockRaw = document.getElementById("stock").value.trim();
+        const errors = [];
+
+        if (!product_name || product_name.length > 100) errors.push("Product name is required (max 100 chars).");
+        if (!category || category.length > 50) errors.push("Category is required (max 50 chars).");
+        if (!isValidPriceStr(priceRaw)) errors.push("Price must be 0 or greater with up to 2 decimal places.");
+        if (!/^\d+$/.test(stockRaw) || Number(stockRaw) < 0) errors.push("Stock must be a whole number 0 or greater.");
+
+        if (errors.length) {
+          document.getElementById("errors").innerHTML =
+            '<div class="error-box"><ul>' + errors.map(err => `<li>${err}</li>`).join("") + "</ul></div>";
+          return;
+        }
+
+        updateRecord(r.id, { product_name, category, price: Number(priceRaw), stock: Number(stockRaw) });
+        location.href = "index.html";
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Product Details</h1>
+    <div class="nav-links"><a href="index.html">Back</a></div>
+    <div id="detailArea"></div>
+  </div>
+
+  <script src="storage.js"></script>
+  <script>
+    const id = Number(new URLSearchParams(location.search).get("id"));
+    const r = Number.isInteger(id) && id > 0 ? getRecordById(id) : null;
+    const area = document.getElementById("detailArea");
+
+    if (!r) {
+      area.innerHTML = '<p class="muted">Record not found.</p>';
+    } else {
+      area.innerHTML = `
+        <div class="detail-card">
+          <p><strong>ID:</strong> ${r.id}</p>
+          <p><strong>Product Name:</strong> <span id="v1"></span></p>
+          <p><strong>Category:</strong> <span id="v2"></span></p>
+          <p><strong>Price:</strong> ${formatPrice(r.price)}</p>
+          <p><strong>Stock:</strong> ${r.stock}</p>
+        </div>
+      `;
+      document.getElementById("v1").textContent = r.product_name;
+      document.getElementById("v2").textContent = r.category;
+    }
+  </script>
+</body>
+</html>
